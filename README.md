@@ -1,6 +1,7 @@
 # word-C-earch
 Word search program in C. Easially makes word searchers.
-![Word search example](https://imgur.com/FHgjrpp "Generated word search")
+
+![Generated word search](https://i.imgur.com/FHgjrpp.png)
 ## Usage
 - Appends word seraches to ws.html (appending makes it easier to make a word serach booklet) creates a single one if it does not exist.
 - Pulls words from "words.txt" (this is a fairly large dictionary file). You can create your own word file in this same format.
