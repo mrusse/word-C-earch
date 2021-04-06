@@ -43,8 +43,8 @@ int main(void)
 
     char board[DIM_X][DIM_Y];
 
-    for(int i = 0; i < 14; i++){		
-        for(int j = 0; j < 14; j++){		
+    for(int i = 0; i < DIM_X; i++){		
+        for(int j = 0; j < DIM_Y; j++){		
             board[j][i] = '*';	
         }
     }
@@ -53,8 +53,8 @@ int main(void)
     wordPick(fp, xd, board);
     fprintf(fp,"<p style=\"font-size: 24pt; font-family: Courier New, Courier, monospace\">");
 
-    for(int i = 0; i <14; i++){		
-        for(int j = 0; j < 14; j++){
+    for(int i = 0; i < DIM_X; i++){		
+        for(int j = 0; j < DIM_Y; j++){
             if(board[j][i] == '*'){
                 board[j][i] = 'A' + (rand() % 26);
             }
@@ -93,8 +93,8 @@ void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]){
 
         while(1){
             length = strlen(wordBuff)-2;
-            x = (rand() % 14);
-            y = (rand() % 14);	
+            x = (rand() % DIM_X);
+            y = (rand() % DIM_Y);	
             type = (rand() % 3);	
             direction = (rand() % 2);		
 
@@ -150,11 +150,11 @@ void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]){
 
     int x,y,length,type,direction;
 
-    for(int i = 0; i<14; i++){
+    for(int i = 0; i < DIM_X; i++){
 
         while(1){
-            x = (rand() % 14);
-            y = (rand() % 14);
+            x = (rand() % DIM_X);
+            y = (rand() % DIM_Y);
             length = (4 + (rand() % 4));
             type = (rand() % 3);
             direction = (rand() % 2);
@@ -215,7 +215,7 @@ int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y, int
     if(type == 0){
 
         if(direction == 0){
-            if((x+length) < 14){
+            if((x+length) < DIM_X){
                 for(int i = 0; i <= length; i++){
                     if(wordBuff[i] != board[x+i][y] && board[x+i][y] != '*'){
                         overlap = 1;	
@@ -249,7 +249,7 @@ int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y, int
     if(type == 1){
 
         if(direction == 0){
-            if((y+length) <= 14){
+            if((y+length) <= DIM_Y){
                 for(int i = 0; i <= length; i++){
                     if(wordBuff[i] != board[x][y+i] && board[x][y+i] != '*'){
                         overlap = 1;	
@@ -283,7 +283,7 @@ int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y, int
     if(type == 2){
 
         if(direction == 0){
-            if((x+length) <= 14 && (y+length) <= 14){
+            if((x+length) <= DIM_X && (y+length) <= DIM_Y){
                 for(int i = 0; i <=length; i++){
                     if(wordBuff[i] != board[x+i][y+i] && board[x+i][y+i] != '*'){
                         overlap = 1;
