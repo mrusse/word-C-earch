@@ -9,7 +9,7 @@
 #define DIM_X 14
 #define DIM_Y 14
 
-#define DEBUG
+// #define DEBUG
 
 void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]);
 void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]);
@@ -30,7 +30,6 @@ int main(void)
         fprintf(stderr, "Could not open %s\n", WORD_INPUT);
         perror("fopen");
     }
-
 
 #ifndef DEBUG
     srand(time(NULL));
