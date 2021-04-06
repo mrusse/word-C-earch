@@ -3,22 +3,31 @@
 #include <time.h>
 #include <string.h>
 
+#define HTML_OUTPUT "ws.html"
+#define WORD_INPUT  "words.txt"
+
 #define DEBUG
 
 char full[14][14];
 char wordBuff[255];
-FILE * fp;
-FILE * xd; 
 int overlap = 0;	
 
-void wordPick(void);
-void randWordPick(void);
+void wordPick(FILE *fp, FILE *xd);
+void randWordPick(FILE *fp);
 int validPick(int x, int y, int length, int type, int direction);
 
 int main(void)
 {
-    fp = fopen("ws.html","a");	
-    xd = fopen("words.txt","r");
+    FILE *fp = fopen(HTML_OUTPUT, "a");
+    if (!fp) {
+        fprintf(stderr, "Could not open %s\n", HTML_OUTPUT);
+        perror("fopen");
+    }
+    FILE *xd = fopen(WORD_INPUT, "r");
+    if (!xd) {
+        fprintf(stderr, "Could not open %s\n", WORD_INPUT);
+        perror("fopen");
+    }
 
 #ifndef DEBUG
     srand(time(NULL));
@@ -36,7 +45,7 @@ int main(void)
     }
 
     fprintf(fp,"<table style=font-family:arial;width:25%%><tr><th colspan=2>Words</th></tr><tr>");	
-    wordPick();
+    wordPick(fp, xd);
     fprintf(fp,"<p style=\"font-size: 24pt; font-family: Courier New, Courier, monospace\">");
 
     for(int i = 0; i <14; i++){		
@@ -57,7 +66,7 @@ int main(void)
 
 }
 
-void wordPick(){
+void wordPick(FILE *fp, FILE *xd){
 
     int x,y,length,type,direction,lineNum;
 
@@ -131,7 +140,7 @@ void wordPick(){
     }
 }
 
-void randWordPick(){	
+void randWordPick(FILE *fp){	
 
     int x,y,length,type,direction;
 

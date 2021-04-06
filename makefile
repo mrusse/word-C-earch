@@ -10,7 +10,6 @@ $(EXE): wordSearch.c
 
 run: $(EXE)
 	./$(EXE)
-	cat $(OUTPUT)
 
 clean:
 	rm -rf $(EXE) $(OUTPUT)
