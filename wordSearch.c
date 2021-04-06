@@ -3,6 +3,8 @@
 #include <time.h>
 #include <string.h>
 
+#define DEBUG
+
 char full[14][14];
 char wordBuff[255];
 FILE * fp;
@@ -18,7 +20,13 @@ int main(void)
     fp = fopen("ws.html","a");	
     xd = fopen("words.txt","r");
 
+#ifndef DEBUG
     srand(time(NULL));
+#else
+    // better to debug with the same seed
+    srand(0);
+#endif
+
     fprintf(fp,"<html><head><style>table, th, td {border: 1px solid black;border-collapse: collapse;}th, td {padding: 5px;text-align: left;    }</style></head><body>");
 
     for(int i = 0; i <14; i++){		
