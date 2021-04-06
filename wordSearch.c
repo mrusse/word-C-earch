@@ -56,7 +56,6 @@ void wordPick(){
 	for(int i = 0; i<18; i++){	
 
 		while(1){
-			
 			lineNum = (rand() % 3000);
 			xd = fopen("words.txt","r");
 
@@ -67,11 +66,9 @@ void wordPick(){
 			if(strlen(wordBuff)-2 > 4 && strlen(wordBuff)-2 < 10){
 				break;
 			}
-			
 		}
 
 		while(1){
-
 			length = strlen(wordBuff)-2;
 			x = (rand() % 14);
 			y = (rand() % 14);	
@@ -84,7 +81,6 @@ void wordPick(){
 			}else{
 				continue;
 			}			
-
 		}
 
 		for(int j = 0; j <= length; j++){
@@ -134,7 +130,6 @@ void randWordPick(){
 	for(int i = 0; i<14; i++){
 
 		while(1){
-
 			x = (rand() % 14);
 			y = (rand() % 14);
 			length = (4 + (rand() % 4));
@@ -146,7 +141,6 @@ void randWordPick(){
 			}else{
 				continue;
 			}			
-
 		}
 	
 		char tempWord[length+1];		
@@ -198,7 +192,6 @@ int validPick(int x,int y,int length, int type, int direction){
 	if(type == 0){
 
 		if(direction == 0){
-
 			if((x+length) < 14){
 				for(int i = 0; i <= length; i++){
 					if(wordBuff[i] != full[x+i][y] && full[x+i][y] != '*'){
@@ -211,11 +204,9 @@ int validPick(int x,int y,int length, int type, int direction){
 				return 0;
 				overlap = 0;
 			}			
-
 		}
 
 		if(direction == 1){
-			
 			if((x-length) > -1){
 				for(int i = 0; i <= length; i++){
 					if(wordBuff[i] != full[x-i][y] && full[x-i][y] != '*'){
@@ -228,7 +219,6 @@ int validPick(int x,int y,int length, int type, int direction){
 				return 0;
 				overlap = 0;
 			}
-
 		}
 
 	}
@@ -236,7 +226,6 @@ int validPick(int x,int y,int length, int type, int direction){
 	if(type == 1){
 
 		if(direction == 0){
-
 			if((y+length) <= 14){
 				for(int i = 0; i <= length; i++){
 					if(wordBuff[i] != full[x][y+i] && full[x][y+i] != '*'){
@@ -249,11 +238,9 @@ int validPick(int x,int y,int length, int type, int direction){
 				return 0;
 				overlap = 0;
 			}			
-
 		}
 
 		if(direction == 1){
-			
 			if((y-length) > -1){
 				for(int i = 0; i <= length; i++){
 					if(wordBuff[i] != full[x][y-i] && full[x][y-i] != '*'){
@@ -266,7 +253,6 @@ int validPick(int x,int y,int length, int type, int direction){
 				return 0;
 				overlap = 0;
 			}
-
 		}
 
 	}
@@ -274,7 +260,6 @@ int validPick(int x,int y,int length, int type, int direction){
 	if(type == 2){
 
 		if(direction == 0){
-
 			if((x+length) <= 14 && (y+length) <= 14){
 				for(int i = 0; i <=length; i++){
 					if(wordBuff[i] != full[x+i][y+i] && full[x+i][y+i] != '*'){
@@ -287,11 +272,9 @@ int validPick(int x,int y,int length, int type, int direction){
 				return 0;
 				overlap = 0;
 			}	
-
 		}
 
 		if(direction == 1){
-
 			if((x-length) > -1 && (y-length) > -1){
 				for(int i = 0; i <= length; i++){
 					if(wordBuff[i] != full[x-i][y-i] && full[x-i][y-i] != '*'){
