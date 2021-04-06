@@ -11,12 +11,11 @@
 
 #define DEBUG
 
-char wordBuff[255];
-int overlap = 0;	
-
 void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]);
-void randWordPick(FILE *fp, char board[DIM_X][DIM_Y]);
-int validPick(char board[DIM_X][DIM_Y], int x, int y, int length, int type, int direction);
+void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]);
+int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y, int length, int type, int direction);
+
+int overlap = 0;	
 
 int main(void)
 {
@@ -75,6 +74,7 @@ int main(void)
 void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]){
 
     int x,y,length,type,direction,lineNum;
+    char wordBuff[BUFSIZ];
 
     for(int i = 0; i<18; i++){	
 
@@ -98,7 +98,7 @@ void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]){
             type = (rand() % 3);	
             direction = (rand() % 2);		
 
-            if(validPick(board, x,y,length,type,direction) == 1){
+            if(validPick(board, wordBuff, x,y,length,type,direction) == 1){
                 //overlap = 0;
                 break;
             }else{
@@ -146,7 +146,7 @@ void wordPick(FILE *fp, FILE *xd, char board[DIM_X][DIM_Y]){
     }
 }
 
-void randWordPick(FILE *fp, char board[DIM_X][DIM_Y]){	
+void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]){	
 
     int x,y,length,type,direction;
 
@@ -159,7 +159,7 @@ void randWordPick(FILE *fp, char board[DIM_X][DIM_Y]){
             type = (rand() % 3);
             direction = (rand() % 2);
 
-            if(validPick(board, x,y,length,type,direction) == 1){
+            if(validPick(board, wordBuff, x,y,length,type,direction) == 1){
                 break;
             }else{
                 continue;
@@ -210,7 +210,7 @@ void randWordPick(FILE *fp, char board[DIM_X][DIM_Y]){
     }
 }
 
-int validPick(char board[DIM_X][DIM_Y], int x, int y, int length, int type, int direction){
+int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y, int length, int type, int direction){
 
     if(type == 0){
 
