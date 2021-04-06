@@ -19,35 +19,25 @@ int main(){
 	xd = fopen("words.txt","r");
 
 	srand(time(NULL));
-
 	fprintf(fp,"<html><head><style>table, th, td {border: 1px solid black;border-collapse: collapse;}th, td {padding: 5px;text-align: left;    }</style></head><body>");
 	
-
 	for(int i = 0; i <14; i++){		
-
-		for(int j = 0; j < 14; j++){
-			
-			full[j][i] = '*';
-			
+		for(int j = 0; j < 14; j++){		
+			full[j][i] = '*';	
 		}
-
 	}
 	
 	fprintf(fp,"<table style=font-family:arial;width:25\%><tr><th colspan=2>Words</th></tr><tr>");	
-
 	wordPick();
-
 	fprintf(fp,"<p style=\"font-size: 24pt; font-family: Courier New, Courier, monospace\">");
 
 	for(int i = 0; i <14; i++){		
-
 		for(int j = 0; j < 14; j++){
 			if(full[j][i] == '*'){
 				full[j][i] = 'A' + (rand() % 26);
 			}
 			fprintf(fp,"%c ",full[j][i]);
 		}
-
 		fprintf(fp,"<br/>");
 	}
 	
@@ -66,7 +56,6 @@ void wordPick(){
 	for(int i = 0; i<18; i++){	
 
 		while(1){
-		
 			
 			lineNum = (rand() % 3000);
 			xd = fopen("words.txt","r");
@@ -79,9 +68,10 @@ void wordPick(){
 				break;
 			}
 			
-		
 		}
+
 		while(1){
+
 			length = strlen(wordBuff)-2;
 			x = (rand() % 14);
 			y = (rand() % 14);	
@@ -95,56 +85,45 @@ void wordPick(){
 				continue;
 			}			
 
-
 		}
-
-		//overlap = 0;
 
 		for(int j = 0; j <= length; j++){
 			
-			//printf("in\n");
-						
 			if(type == 0){
-				
 				if(direction == 0){
-					//printf("t0d0\n");
 					full[x+j][y] = wordBuff[j];
 				}
 				if(direction == 1){
-					//printf("t0d1\n");
 					full[x-j][y] = wordBuff[j];
 				}
-				
 			}
+
 			if(type == 1){
-				
 				if(direction == 0){
-					//printf("t1d0\n");
 					full[x][y+j] = wordBuff[j];
 				}
 				if(direction == 1){
-					//printf("t1d1\n");
 					full[x][y-j] = wordBuff[j];
 				}
 				
 			}
+			
 			if(type == 2){
-				
 				if(direction == 0){
-					//printf("t2d0\n");
 					full[x+j][y+j] = wordBuff[j];
 				}
 				if(direction == 1){
-					//printf("t2d1\n");
 					full[x-j][y-j] = wordBuff[j];
 				}
 			}
 		}
+
 		if(i%2 == 0 && i!=0){
 			fprintf(fp,"</tr><tr><td>%s</td>",wordBuff);
 		}else{
 			fprintf(fp,"<td>%s</td>",wordBuff);
-		}			
+		}
+
 	}
 }
 
@@ -174,28 +153,25 @@ void randWordPick(){
 	
 		for(int j = 0; j < length; j++){
 				
-			if(type == 0){
-				
+			if(type == 0){		
 				if(direction == 0){
 					tempWord[j] = full[x+j][y];
 				}
 				if(direction == 1){
 					tempWord[j] = full[x-j][y];
-				}
-				
+				}				
 			}
-			if(type == 1){
-				
+			
+			if(type == 1){				
 				if(direction == 0){
 					tempWord[j] = full[x][y+j];
 				}
 				if(direction == 1){
 					tempWord[j] = full[x][y-j];
-				}
-				
+				}				
 			}
-			if(type == 2){
-				
+
+			if(type == 2){				
 				if(direction == 0){
 					tempWord[j] = full[x+j][y+j];
 				}
@@ -203,6 +179,7 @@ void randWordPick(){
 					tempWord[j] = full[x-j][y-j];
 				}
 			}
+
 		}
 
 		tempWord[length+1] = '\0';
