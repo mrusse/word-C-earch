@@ -52,3 +52,6 @@ Mkfile.old
 dkms.conf
 
 ws.html
+*.swp
+a.out
+wordSearch
