@@ -9,7 +9,7 @@
 #define DIM_X 14
 #define DIM_Y 14
 
-#define NUM_WORDS 18
+#define NUM_WORDS 14
 #define FILE_WORD_COUNT 3000
 
 // #define DEBUG
@@ -17,7 +17,6 @@
 // TODO: line 86, optimize program so it doesn't read in the file every time
 
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y]);
-void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]);
 int  validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
                int length, int type, int direction);
 
@@ -63,7 +62,7 @@ int main(void)
     for (int i = 0; i < DIM_X; i++) {
         for (int j = 0; j < DIM_Y; j++) {
             if (board[j][i] == '*') {
-                board[j][i] = 'A' + (rand() % 26);
+                //board[j][i] = 'A' + (rand() % 26);
             }
             fprintf(fp, "%c ", board[j][i]);
         }
@@ -138,60 +137,6 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             fprintf(fp, "</tr><tr><td>%s</td>", wordBuff);
         } else {
             fprintf(fp, "<td>%s</td>", wordBuff);
-        }
-    }
-}
-
-void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ])
-{
-    int x, y, length, type, direction;
-
-    for (int i = 0; i < DIM_X; i++) {
-        do {
-            x         = (rand() % DIM_X);
-            y         = (rand() % DIM_Y);
-            length    = (4 + (rand() % 4));
-            type      = (rand() % 3);
-            direction = (rand() % 2);
-        } while (!validPick(board, wordBuff, x, y, length, type, direction));
-
-        char tempWord[length + 1];
-
-        for (int j = 0; j < length; j++) {
-            if (type == 0) {
-                if (direction == 0) {
-                    tempWord[j] = board[x + j][y];
-                }
-                if (direction == 1) {
-                    tempWord[j] = board[x - j][y];
-                }
-            }
-
-            if (type == 1) {
-                if (direction == 0) {
-                    tempWord[j] = board[x][y + j];
-                }
-                if (direction == 1) {
-                    tempWord[j] = board[x][y - j];
-                }
-            }
-
-            if (type == 2) {
-                if (direction == 0) {
-                    tempWord[j] = board[x + j][y + j];
-                }
-                if (direction == 1) {
-                    tempWord[j] = board[x - j][y - j];
-                }
-            }
-        }
-
-        tempWord[length + 1] = '\0';
-
-        if (i % 2 == 0 && i != 0) {
-            fprintf(fp, "</tr><tr><td>%s</td>", tempWord);
-        } else {
-            fprintf(fp, "<td>%s</td>", tempWord);
         }
     }
 }
