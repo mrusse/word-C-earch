@@ -62,7 +62,7 @@ int main(void)
     for (int i = 0; i < DIM_X; i++) {
         for (int j = 0; j < DIM_Y; j++) {
             if (board[j][i] == '*') {
-                //board[j][i] = 'A' + (rand() % 26);
+                board[j][i] = 'A' + (rand() % 26);
             }
             fprintf(fp, "%c ", board[j][i]);
         }
