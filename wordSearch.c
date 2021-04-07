@@ -51,7 +51,7 @@ int main(void)
     }
 
     fprintf(fp,
-            "<table style=font-family:arial;width:25%%><tr><th "
+            "<table style=font-family:arial;width15%%><tr><th "
             "colspan=2>Words</th></tr><tr>");
 
     wordPick(fp, board);
