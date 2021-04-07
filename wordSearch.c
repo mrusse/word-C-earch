@@ -15,7 +15,6 @@
 // #define DEBUG
 
 // TODO: line 86, optimize program so it doesn't read in the file every time
-// TODO: fix infinite loops that happen sometimes
 
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y]);
 void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]);
@@ -81,7 +80,7 @@ int main(void)
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
 {
     int  x, y, length, type, direction, lineNum;
-    char wordBuff[BUFSIZ];
+    char wordBuff[BUFSIZ] = "";
 
     for (int i = 0; i < NUM_WORDS; i++) {
         do {
