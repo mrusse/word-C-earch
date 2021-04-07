@@ -11,5 +11,8 @@ $(EXE): wordSearch.c
 run: $(EXE)
 	./$(EXE)
 
+runv: $(EXE)
+	valgrind $(VFLAGS) ./$(EXE)
+
 clean:
 	rm -rf $(EXE) $(OUTPUT)
