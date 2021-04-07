@@ -1,292 +1,306 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<time.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-char full[14][14];
-char wordBuff[255];
-FILE * fp;
-FILE * xd; 
-int overlap = 0;	
+#define HTML_OUTPUT "ws.html"
+#define WORD_INPUT "words.txt"
 
-void wordPick();
-void randWordPick();
-int validPick(int x,int y,int length, int type, int direction);
+#define DIM_X 14
+#define DIM_Y 14
 
-int main(){
+#define NUM_WORDS 18
+#define FILE_WORD_COUNT 3000
 
-	fp = fopen("ws.html","a");	
-	xd = fopen("words.txt","r");
+// #define DEBUG
 
-	srand(time(NULL));
-	fprintf(fp,"<html><head><style>table, th, td {border: 1px solid black;border-collapse: collapse;}th, td {padding: 5px;text-align: left;    }</style></head><body>");
-	
-	for(int i = 0; i <14; i++){		
-		for(int j = 0; j < 14; j++){		
-			full[j][i] = '*';	
-		}
-	}
-	
-	fprintf(fp,"<table style=font-family:arial;width:25\%><tr><th colspan=2>Words</th></tr><tr>");	
-	wordPick();
-	fprintf(fp,"<p style=\"font-size: 24pt; font-family: Courier New, Courier, monospace\">");
+// TODO: line 86, optimize program so it doesn't read in the file every time
+// TODO: fix infinite loops that happen sometimes
 
-	for(int i = 0; i <14; i++){		
-		for(int j = 0; j < 14; j++){
-			if(full[j][i] == '*'){
-				full[j][i] = 'A' + (rand() % 26);
-			}
-			fprintf(fp,"%c ",full[j][i]);
-		}
-		fprintf(fp,"<br/>");
-	}
-	
-	fprintf(fp,"</p>");	
-	fprintf(fp,"</table></body></html>");
-	fclose(fp);	
+void wordPick(FILE *fp, char board[DIM_X][DIM_Y]);
+void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ]);
+int  validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
+               int length, int type, int direction);
 
-	return 0;
+int overlap = 0;
 
+int main(void)
+{
+    FILE *fp = fopen(HTML_OUTPUT, "a");
+    if (!fp) {
+        fprintf(stderr, "Could not open %s\n", HTML_OUTPUT);
+        perror("fopen");
+    }
+
+#ifndef DEBUG
+    srand(time(NULL));
+#else
+    // better to debug with the same seed
+    srand(0);
+#endif
+
+    fprintf(fp,
+            "<html><head><style>table, th, td {border: 1px solid "
+            "black;border-collapse: collapse;}th, td {padding: 5px;text-align: "
+            "left;    }</style></head><body>");
+
+    char board[DIM_X][DIM_Y];
+
+    for (int i = 0; i < DIM_X; i++) {
+        for (int j = 0; j < DIM_Y; j++) {
+            board[i][j] = '*';
+        }
+    }
+
+    fprintf(fp,
+            "<table style=font-family:arial;width:25%%><tr><th "
+            "colspan=2>Words</th></tr><tr>");
+
+    wordPick(fp, board);
+    fprintf(fp,
+            "<p style=\"font-size: 24pt; font-family: Courier New, Courier, "
+            "monospace\">");
+
+    for (int i = 0; i < DIM_X; i++) {
+        for (int j = 0; j < DIM_Y; j++) {
+            if (board[j][i] == '*') {
+                board[j][i] = 'A' + (rand() % 26);
+            }
+            fprintf(fp, "%c ", board[j][i]);
+        }
+        fprintf(fp, "<br/>");
+    }
+
+    fprintf(fp, "</p>");
+    fprintf(fp, "</table></body></html>");
+    fclose(fp);
+
+    return 0;
 }
 
-void wordPick(){
+void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
+{
+    int  x, y, length, type, direction, lineNum;
+    char wordBuff[BUFSIZ];
 
-	int x,y,length,type,direction,lineNum;
-	
-	for(int i = 0; i<18; i++){	
+    for (int i = 0; i < NUM_WORDS; i++) {
+        do {
+            lineNum  = (rand() % FILE_WORD_COUNT);
+            FILE *xd = fopen(WORD_INPUT, "r");
+            if (!xd) {
+                fprintf(stderr, "Could not open %s\n", WORD_INPUT);
+                perror("fopen");
+            }
 
-		while(1){
-			lineNum = (rand() % 3000);
-			xd = fopen("words.txt","r");
+            for (int i = 0; i < lineNum; i++) {
+                fgets(wordBuff, BUFSIZ, xd);
+            }
+            fclose(xd);
+        } while (strlen(wordBuff) < 7 || strlen(wordBuff) > 11);
 
-			for(int i = 0; i < lineNum; i++){
-				fgets(wordBuff, 255, (FILE*)xd);
-			}	
+        do {
+            length    = strlen(wordBuff) - 2;
+            x         = (rand() % DIM_X);
+            y         = (rand() % DIM_Y);
+            type      = (rand() % 3);
+            direction = (rand() % 2);
+        } while (!validPick(board, wordBuff, x, y, length, type, direction));
 
-			if(strlen(wordBuff)-2 > 4 && strlen(wordBuff)-2 < 10){
-				break;
-			}
-		}
+        for (int j = 0; j <= length; j++) {
+            if (type == 0) {
+                if (direction == 0) {
+                    board[x + j][y] = wordBuff[j];
+                }
+                if (direction == 1) {
+                    board[x - j][y] = wordBuff[j];
+                }
+            }
 
-		while(1){
-			length = strlen(wordBuff)-2;
-			x = (rand() % 14);
-			y = (rand() % 14);	
-			type = (rand() % 3);	
-			direction = (rand() % 2);		
+            if (type == 1) {
+                if (direction == 0) {
+                    board[x][y + j] = wordBuff[j];
+                }
+                if (direction == 1) {
+                    board[x][y - j] = wordBuff[j];
+                }
+            }
 
-			if(validPick(x,y,length,type,direction) == 1){
-				//overlap = 0;
-				break;
-			}else{
-				continue;
-			}			
-		}
+            if (type == 2) {
+                if (direction == 0) {
+                    board[x + j][y + j] = wordBuff[j];
+                }
+                if (direction == 1) {
+                    board[x - j][y - j] = wordBuff[j];
+                }
+            }
+        }
 
-		for(int j = 0; j <= length; j++){
-			
-			if(type == 0){
-				if(direction == 0){
-					full[x+j][y] = wordBuff[j];
-				}
-				if(direction == 1){
-					full[x-j][y] = wordBuff[j];
-				}
-			}
-
-			if(type == 1){
-				if(direction == 0){
-					full[x][y+j] = wordBuff[j];
-				}
-				if(direction == 1){
-					full[x][y-j] = wordBuff[j];
-				}
-				
-			}
-			
-			if(type == 2){
-				if(direction == 0){
-					full[x+j][y+j] = wordBuff[j];
-				}
-				if(direction == 1){
-					full[x-j][y-j] = wordBuff[j];
-				}
-			}
-		}
-
-		if(i%2 == 0 && i!=0){
-			fprintf(fp,"</tr><tr><td>%s</td>",wordBuff);
-		}else{
-			fprintf(fp,"<td>%s</td>",wordBuff);
-		}
-
-	}
+        if (i % 2 == 0 && i != 0) {
+            fprintf(fp, "</tr><tr><td>%s</td>", wordBuff);
+        } else {
+            fprintf(fp, "<td>%s</td>", wordBuff);
+        }
+    }
 }
 
-void randWordPick(){	
+void randWordPick(FILE *fp, char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ])
+{
+    int x, y, length, type, direction;
 
-	int x,y,length,type,direction;
+    for (int i = 0; i < DIM_X; i++) {
+        do {
+            x         = (rand() % DIM_X);
+            y         = (rand() % DIM_Y);
+            length    = (4 + (rand() % 4));
+            type      = (rand() % 3);
+            direction = (rand() % 2);
+        } while (!validPick(board, wordBuff, x, y, length, type, direction));
 
-	for(int i = 0; i<14; i++){
+        char tempWord[length + 1];
 
-		while(1){
-			x = (rand() % 14);
-			y = (rand() % 14);
-			length = (4 + (rand() % 4));
-			type = (rand() % 3);
-			direction = (rand() % 2);
+        for (int j = 0; j < length; j++) {
+            if (type == 0) {
+                if (direction == 0) {
+                    tempWord[j] = board[x + j][y];
+                }
+                if (direction == 1) {
+                    tempWord[j] = board[x - j][y];
+                }
+            }
 
-			if(validPick(x,y,length,type,direction) == 1){
-				break;
-			}else{
-				continue;
-			}			
-		}
-	
-		char tempWord[length+1];		
-	
-		for(int j = 0; j < length; j++){
-				
-			if(type == 0){		
-				if(direction == 0){
-					tempWord[j] = full[x+j][y];
-				}
-				if(direction == 1){
-					tempWord[j] = full[x-j][y];
-				}				
-			}
-			
-			if(type == 1){				
-				if(direction == 0){
-					tempWord[j] = full[x][y+j];
-				}
-				if(direction == 1){
-					tempWord[j] = full[x][y-j];
-				}				
-			}
+            if (type == 1) {
+                if (direction == 0) {
+                    tempWord[j] = board[x][y + j];
+                }
+                if (direction == 1) {
+                    tempWord[j] = board[x][y - j];
+                }
+            }
 
-			if(type == 2){				
-				if(direction == 0){
-					tempWord[j] = full[x+j][y+j];
-				}
-				if(direction == 1){
-					tempWord[j] = full[x-j][y-j];
-				}
-			}
+            if (type == 2) {
+                if (direction == 0) {
+                    tempWord[j] = board[x + j][y + j];
+                }
+                if (direction == 1) {
+                    tempWord[j] = board[x - j][y - j];
+                }
+            }
+        }
 
-		}
+        tempWord[length + 1] = '\0';
 
-		tempWord[length+1] = '\0';
-	
-		if(i%2 == 0 && i!=0){
-			fprintf(fp,"</tr><tr><td>%s</td>",tempWord);
-		}else{
-			fprintf(fp,"<td>%s</td>",tempWord);
-		}
-
-	}
+        if (i % 2 == 0 && i != 0) {
+            fprintf(fp, "</tr><tr><td>%s</td>", tempWord);
+        } else {
+            fprintf(fp, "<td>%s</td>", tempWord);
+        }
+    }
 }
 
-int validPick(int x,int y,int length, int type, int direction){
+int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
+              int length, int type, int direction)
+{
+    if (type == 0) {
+        if (direction == 0) {
+            if ((x + length) < DIM_X) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x + i][y] &&
+                        board[x + i][y] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
 
-	if(type == 0){
+        if (direction == 1) {
+            if ((x - length) > -1) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x - i][y] &&
+                        board[x - i][y] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
+    }
+    //---------------------//
+    if (type == 1) {
+        if (direction == 0) {
+            if ((y + length) <= DIM_Y) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x][y + i] &&
+                        board[x][y + i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
 
-		if(direction == 0){
-			if((x+length) < 14){
-				for(int i = 0; i <= length; i++){
-					if(wordBuff[i] != full[x+i][y] && full[x+i][y] != '*'){
-						overlap = 1;	
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}			
-		}
+        if (direction == 1) {
+            if ((y - length) > -1) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x][y - i] &&
+                        board[x][y - i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
+    }
+    //---------------------//
+    if (type == 2) {
+        if (direction == 0) {
+            if ((x + length) <= DIM_X && (y + length) <= DIM_Y) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x + i][y + i] &&
+                        board[x + i][y + i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
 
-		if(direction == 1){
-			if((x-length) > -1){
-				for(int i = 0; i <= length; i++){
-					if(wordBuff[i] != full[x-i][y] && full[x-i][y] != '*'){
-						overlap = 1;
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}
-		}
-
-	}
-	//---------------------//
-	if(type == 1){
-
-		if(direction == 0){
-			if((y+length) <= 14){
-				for(int i = 0; i <= length; i++){
-					if(wordBuff[i] != full[x][y+i] && full[x][y+i] != '*'){
-						overlap = 1;	
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}			
-		}
-
-		if(direction == 1){
-			if((y-length) > -1){
-				for(int i = 0; i <= length; i++){
-					if(wordBuff[i] != full[x][y-i] && full[x][y-i] != '*'){
-						overlap = 1;			
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}
-		}
-
-	}
-	//---------------------//
-	if(type == 2){
-
-		if(direction == 0){
-			if((x+length) <= 14 && (y+length) <= 14){
-				for(int i = 0; i <=length; i++){
-					if(wordBuff[i] != full[x+i][y+i] && full[x+i][y+i] != '*'){
-						overlap = 1;
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}	
-		}
-
-		if(direction == 1){
-			if((x-length) > -1 && (y-length) > -1){
-				for(int i = 0; i <= length; i++){
-					if(wordBuff[i] != full[x-i][y-i] && full[x-i][y-i] != '*'){
-						overlap = 1;
-						return 0;
-					} 				
-				}
-				return 1;
-			}else{
-				return 0;
-				overlap = 0;
-			}
-		}
-	}
+        if (direction == 1) {
+            if ((x - length) > -1 && (y - length) > -1) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x - i][y - i] &&
+                        board[x - i][y - i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
+    }
+    fprintf(stderr, "Invalid choice\n");
+    return 0;
 }
