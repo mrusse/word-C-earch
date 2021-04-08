@@ -29,6 +29,7 @@ int main(void)
     if (!fp) {
         fprintf(stderr, "Could not open %s\n", HTML_OUTPUT);
         perror("fopen");
+        exit(1);
     }
 
 #ifndef DEBUG
@@ -90,6 +91,7 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             if (!xd) {
                 fprintf(stderr, "Could not open %s\n", WORD_INPUT);
                 perror("fopen");
+                exit(1);
             }
 
             for (int i = 0; i < lineNum; i++) {
@@ -118,6 +120,7 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
                     if (!xd) {
                         fprintf(stderr, "Could not open %s\n", WORD_INPUT);
                         perror("fopen");
+                        exit(1);
                     }
 
                     for (int i = 0; i < lineNum; i++) {
