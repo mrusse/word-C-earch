@@ -12,9 +12,10 @@
 #define NUM_WORDS 14
 #define FILE_WORD_COUNT 3000
 
-// #define DEBUG
+//#define DEBUG
 
 // TODO: line 86, optimize program so it doesn't read in the file every time
+// TODO: Your mom
 
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y]);
 int  validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
@@ -62,7 +63,8 @@ int main(void)
     for (int i = 0; i < DIM_X; i++) {
         for (int j = 0; j < DIM_Y; j++) {
             if (board[j][i] == '*') {
-                board[j][i] = 'A' + (rand() % 26);
+                //comment this line for debug
+                board[j][i] = 'A' + (rand() % 26); 
             }
             fprintf(fp, "%c ", board[j][i]);
         }
@@ -78,7 +80,7 @@ int main(void)
 
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
 {
-    int  x, y, length, type, direction, lineNum;
+    int  x, y, length, type, direction, lineNum, count;
     char wordBuff[BUFSIZ] = "";
 
     for (int i = 0; i < NUM_WORDS; i++) {
@@ -96,13 +98,41 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             fclose(xd);
         } while (strlen(wordBuff) < 7 || strlen(wordBuff) > 11);
 
+        count = 0;
+
         do {
+            //this length is one less than it should be but making it -1 instead breaks everything idk why
             length    = strlen(wordBuff) - 2;
             x         = (rand() % DIM_X);
             y         = (rand() % DIM_Y);
             type      = (rand() % 3);
             direction = (rand() % 2);
+
+            count ++;
+            //printf("%d\n",count);
+
+            if (count > 100){
+                do {
+                    lineNum  = (rand() % FILE_WORD_COUNT);
+                    FILE *xd = fopen(WORD_INPUT, "r");
+                    if (!xd) {
+                        fprintf(stderr, "Could not open %s\n", WORD_INPUT);
+                        perror("fopen");
+                    }
+
+                    for (int i = 0; i < lineNum; i++) {
+                        fgets(wordBuff, BUFSIZ, xd);
+                    }
+                    fclose(xd);
+                } while (strlen(wordBuff) < 7 || strlen(wordBuff) > 11);
+                
+                count = 0;
+
+            }        
         } while (!validPick(board, wordBuff, x, y, length, type, direction));
+
+        //type 1 is horizontal, 2 is vertical, 3 is diagonal.
+        //direction 0 is left to right 1 is reverse (i think lol) 
 
         for (int j = 0; j <= length; j++) {
             if (type == 0) {
@@ -144,9 +174,13 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
 int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
               int length, int type, int direction)
 {
+
+    //ill just add one here i guess
+    length += 1;
+
     if (type == 0) {
         if (direction == 0) {
-            if ((x + length) < DIM_X) {
+            if ((x + length) <= DIM_X) {
                 for (int i = 0; i <= length; i++) {
                     if (wordBuff[i] != board[x + i][y] &&
                         board[x + i][y] != '*') {
@@ -188,6 +222,8 @@ int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
                         return 0;
                     }
                 }
+                //printf(wordBuff);
+                //printf("%d\n",length);
                 return 1;
             } else {
                 return 0;
