@@ -105,7 +105,7 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             length    = strlen(wordBuff) - 2;
             x         = (rand() % DIM_X);
             y         = (rand() % DIM_Y);
-            type      = (rand() % 3);
+            type      = (rand() % 4);
             direction = (rand() % 2);
 
             count ++;
@@ -131,7 +131,7 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             }        
         } while (!validPick(board, wordBuff, x, y, length, type, direction));
 
-        //type 1 is horizontal, 2 is vertical, 3 is diagonal.
+        //type 0 is horizontal, 1 is vertical, 2 is diagonal top left bottom right slant, 3 is other diagonal
         //direction 0 is left to right 1 is reverse (i think lol) 
 
         for (int j = 0; j <= length; j++) {
@@ -159,6 +159,15 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
                 }
                 if (direction == 1) {
                     board[x - j][y - j] = wordBuff[j];
+                }
+            }
+
+            if (type == 3) {
+                if (direction == 0) {
+                    board[x - j][y + j] = wordBuff[j];
+                }
+                if (direction == 1) {
+                    board[x + j][y - j] = wordBuff[j];
                 }
             }
         }
@@ -270,6 +279,41 @@ int validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
                 for (int i = 0; i <= length; i++) {
                     if (wordBuff[i] != board[x - i][y - i] &&
                         board[x - i][y - i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
+    }
+    //---------------------//
+    if (type == 3) {
+        
+        if (direction == 0) {
+            if ((x - length) <= DIM_X && (y + length) <= DIM_Y) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x - i][y + i] &&
+                        board[x - i][y + i] != '*') {
+                        overlap = 1;
+                        return 0;
+                    }
+                }
+                return 1;
+            } else {
+                return 0;
+                overlap = 0;
+            }
+        }
+
+        if (direction == 1) {
+            if ((x + length) > -1 && (y - length) > -1) {
+                for (int i = 0; i <= length; i++) {
+                    if (wordBuff[i] != board[x + i][y - i] &&
+                        board[x + i][y - i] != '*') {
                         overlap = 1;
                         return 0;
                     }
