@@ -15,7 +15,6 @@
 
 //#define DEBUG
 
-// TODO: line 86, optimize program so it doesn't read in the file every time
 // TODO: Your mom
 
 void wordPick(FILE *fp, char board[DIM_X][DIM_Y],
