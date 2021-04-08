@@ -11,15 +11,17 @@
 
 #define NUM_WORDS 14
 #define FILE_WORD_COUNT 3000
+#define MAX_WORD_LENGTH 16 // Longest word in file is AFRICANAMERICAN
 
 //#define DEBUG
 
-// TODO: line 86, optimize program so it doesn't read in the file every time
 // TODO: Your mom
 
-void wordPick(FILE *fp, char board[DIM_X][DIM_Y]);
+void wordPick(FILE *fp, char board[DIM_X][DIM_Y],
+              char words[FILE_WORD_COUNT][MAX_WORD_LENGTH]);
 int  validPick(char board[DIM_X][DIM_Y], char wordBuff[BUFSIZ], int x, int y,
                int length, int type, int direction);
+void loadWords(FILE *wordFile, char words[FILE_WORD_COUNT][MAX_WORD_LENGTH]);
 
 int overlap = 0;
 
@@ -29,6 +31,7 @@ int main(void)
     if (!fp) {
         fprintf(stderr, "Could not open %s\n", HTML_OUTPUT);
         perror("fopen");
+        exit(1);
     }
 
 #ifndef DEBUG
@@ -55,7 +58,19 @@ int main(void)
             "<table style=font-family:arial;width15%%><tr><th "
             "colspan=2>Words</th></tr><tr>");
 
-    wordPick(fp, board);
+    FILE *wordFile = fopen(WORD_INPUT, "r");
+    if (!wordFile) {
+        fprintf(stderr, "Could not open %s\n", WORD_INPUT);
+        perror("fopen");
+        exit(1);
+    }
+
+    char words[FILE_WORD_COUNT][MAX_WORD_LENGTH] = {0};
+
+    loadWords(wordFile, words);
+
+    wordPick(fp, board, words);
+
     fprintf(fp,
             "<p style=\"font-size: 24pt; font-family: Courier New, Courier, "
             "monospace\">");
@@ -73,29 +88,36 @@ int main(void)
 
     fprintf(fp, "</p>");
     fprintf(fp, "</table></body></html>");
+
     fclose(fp);
+    fclose(wordFile);
 
     return 0;
 }
 
-void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
+void loadWords(FILE *wordFile, char words[FILE_WORD_COUNT][MAX_WORD_LENGTH])
+{
+    int wordsRead = 0;
+    for (int i = 0; fgets(words[i], BUFSIZ, wordFile); i++) {
+        wordsRead++;
+    }
+    if (wordsRead != FILE_WORD_COUNT) {
+        fprintf(stderr, "Reading error. Expected %d words but got %d\n",
+            FILE_WORD_COUNT, wordsRead);
+        exit(1);
+    }
+}
+
+void wordPick(FILE *fp, char board[DIM_X][DIM_Y],
+              char words[FILE_WORD_COUNT][MAX_WORD_LENGTH])
 {
     int  x, y, length, type, direction, lineNum, count;
     char wordBuff[BUFSIZ] = "";
 
     for (int i = 0; i < NUM_WORDS; i++) {
         do {
-            lineNum  = (rand() % FILE_WORD_COUNT);
-            FILE *xd = fopen(WORD_INPUT, "r");
-            if (!xd) {
-                fprintf(stderr, "Could not open %s\n", WORD_INPUT);
-                perror("fopen");
-            }
-
-            for (int i = 0; i < lineNum; i++) {
-                fgets(wordBuff, BUFSIZ, xd);
-            }
-            fclose(xd);
+            lineNum = rand() % FILE_WORD_COUNT;
+            strcpy(wordBuff, words[lineNum - 1]);
         } while (strlen(wordBuff) < 7 || strlen(wordBuff) > 11);
 
         count = 0;
@@ -111,19 +133,10 @@ void wordPick(FILE *fp, char board[DIM_X][DIM_Y])
             count ++;
             //printf("%d\n",count);
 
-            if (count > 100){
+            if (count > 100) {
                 do {
-                    lineNum  = (rand() % FILE_WORD_COUNT);
-                    FILE *xd = fopen(WORD_INPUT, "r");
-                    if (!xd) {
-                        fprintf(stderr, "Could not open %s\n", WORD_INPUT);
-                        perror("fopen");
-                    }
-
-                    for (int i = 0; i < lineNum; i++) {
-                        fgets(wordBuff, BUFSIZ, xd);
-                    }
-                    fclose(xd);
+                    lineNum = rand() % FILE_WORD_COUNT;
+                    strcpy(wordBuff, words[lineNum - 1]);
                 } while (strlen(wordBuff) < 7 || strlen(wordBuff) > 11);
                 
                 count = 0;
